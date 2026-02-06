@@ -1,5 +1,7 @@
 {
-  "name": "Hotjobsconnect Payroll & HR",
-  "description": "A comprehensive, AI-powered payroll and HR management system with integrated recruitment marketplace.",
-  "requestFramePermissions": []
+  "name": "Hotjobsconnect Unified HR",
+  "description": "Professional recruitment, payroll, and identity verification infrastructure for modern Nigerian enterprises.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
 }

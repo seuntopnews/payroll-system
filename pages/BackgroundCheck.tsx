@@ -1,59 +1,32 @@
 
 import React, { useState } from 'react';
-import { ShieldCheck, Search, Filter, Plus, Download, CheckCircle, XCircle, Clock, AlertTriangle, FileText, User, ChevronRight } from 'lucide-react';
+import { 
+  ShieldCheck, Search, Filter, Plus, Download, CheckCircle, XCircle, Clock, 
+  AlertTriangle, FileText, User, ChevronRight, X, Activity, Database, Fingerprint,
+  Zap, ArrowRight, ShieldAlert, BadgeCheck
+} from 'lucide-react';
 
 interface VerificationRequest {
   id: string;
   candidateName: string;
   candidateRole: string;
-  checks: string[]; // e.g., ['NIN', 'BVN', 'Criminal']
+  checks: string[];
   status: 'Verified' | 'Pending' | 'Failed' | 'In Progress';
   dateRequested: string;
   riskScore: 'Low' | 'Medium' | 'High';
 }
 
 const MOCK_REQUESTS: VerificationRequest[] = [
-  {
-    id: 'VER-001',
-    candidateName: 'David Olaoluwa',
-    candidateRole: 'Senior Frontend Engineer',
-    checks: ['NIN', 'BVN', 'Guarantor'],
-    status: 'Verified',
-    dateRequested: '2023-10-24',
-    riskScore: 'Low'
-  },
-  {
-    id: 'VER-002',
-    candidateName: 'Sarah Mensah',
-    candidateRole: 'Product Manager',
-    checks: ['BVN', 'Criminal Record'],
-    status: 'In Progress',
-    dateRequested: '2023-10-25',
-    riskScore: 'Low'
-  },
-  {
-    id: 'VER-003',
-    candidateName: 'Emmanuel Kalu',
-    candidateRole: 'Sales Executive',
-    checks: ['Academic', 'Guarantor'],
-    status: 'Failed',
-    dateRequested: '2023-10-22',
-    riskScore: 'High'
-  },
-  {
-    id: 'VER-004',
-    candidateName: 'Chinedu Eze',
-    candidateRole: 'DevOps Engineer',
-    checks: ['NIN', 'Previous Employer'],
-    status: 'Pending',
-    dateRequested: '2023-10-26',
-    riskScore: 'Medium'
-  }
+  { id: 'VER-001', candidateName: 'David Olaoluwa', candidateRole: 'Senior Frontend Engineer', checks: ['NIN', 'BVN', 'Guarantor'], status: 'Verified', dateRequested: '2023-10-24', riskScore: 'Low' },
+  { id: 'VER-002', candidateName: 'Sarah Mensah', candidateRole: 'Product Manager', checks: ['BVN', 'Criminal Record'], status: 'In Progress', dateRequested: '2023-10-25', riskScore: 'Low' },
+  { id: 'VER-003', candidateName: 'Emmanuel Kalu', candidateRole: 'Sales Executive', checks: ['Academic', 'Guarantor'], status: 'Failed', dateRequested: '2023-10-22', riskScore: 'High' },
+  { id: 'VER-004', candidateName: 'Chinedu Eze', candidateRole: 'DevOps Engineer', checks: ['NIN', 'Previous Employer'], status: 'Pending', dateRequested: '2023-10-26', riskScore: 'Medium' }
 ];
 
 const BackgroundCheck = () => {
   const [requests, setRequests] = useState<VerificationRequest[]>(MOCK_REQUESTS);
   const [showNewRequestModal, setShowNewRequestModal] = useState(false);
+  const [selectedVerification, setSelectedVerification] = useState<VerificationRequest | null>(null);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -64,213 +37,262 @@ const BackgroundCheck = () => {
     }
   };
 
-  const getRiskBadge = (level: string) => {
-    switch (level) {
-      case 'Low': return <span className="flex items-center gap-1 text-xs font-medium text-green-600"><ShieldCheck size={12} /> Low Risk</span>;
-      case 'Medium': return <span className="flex items-center gap-1 text-xs font-medium text-yellow-600"><AlertTriangle size={12} /> Medium Risk</span>;
-      case 'High': return <span className="flex items-center gap-1 text-xs font-bold text-red-600"><AlertTriangle size={12} /> High Risk</span>;
-      default: return null;
-    }
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 relative pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <ShieldCheck className="text-brand-600" />
-            Background Verification
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+            <ShieldCheck className="text-brand-600" size={32} />
+            Identity Ledger
           </h1>
-          <p className="text-sm text-gray-500">Manage identity checks, criminal records, and guarantor verification.</p>
+          <p className="text-gray-500 font-medium">Verified by Hotjobs Smart Engine • NIBSS Synced</p>
         </div>
-        <button 
-          onClick={() => setShowNewRequestModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 shadow-sm transition-colors"
-        >
-          <Plus size={16} />
-          New Request
-        </button>
-      </div>
-
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-500 font-medium">Total Checks</span>
-            <div className="p-2 bg-gray-50 rounded-lg text-gray-600"><FileText size={18} /></div>
-          </div>
-          <p className="text-2xl font-bold text-gray-900">142</p>
-          <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-            <CheckCircle size={10} /> 12 completed this week
-          </p>
-        </div>
-        
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-500 font-medium">Verified Clean</span>
-            <div className="p-2 bg-green-50 rounded-lg text-green-600"><CheckCircle size={18} /></div>
-          </div>
-          <p className="text-2xl font-bold text-gray-900">128</p>
-          <p className="text-xs text-gray-400 mt-1">90% pass rate</p>
-        </div>
-
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-500 font-medium">Issues Found</span>
-            <div className="p-2 bg-red-50 rounded-lg text-red-600"><AlertTriangle size={18} /></div>
-          </div>
-          <p className="text-2xl font-bold text-gray-900">4</p>
-          <p className="text-xs text-red-600 mt-1 font-medium">Action Required</p>
-        </div>
-
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-500 font-medium">In Progress</span>
-            <div className="p-2 bg-blue-50 rounded-lg text-blue-600"><Clock size={18} /></div>
-          </div>
-          <p className="text-2xl font-bold text-gray-900">10</p>
-          <p className="text-xs text-blue-600 mt-1">Est. completion: 2 days</p>
+        <div className="flex gap-4">
+           <button className="px-6 py-2.5 bg-white border-2 border-gray-100 text-gray-700 rounded-xl text-sm font-black hover:border-brand-600 transition-all flex items-center gap-2">
+             <Download size={18} /> Export Log
+           </button>
+           <button 
+            onClick={() => setShowNewRequestModal(true)}
+            className="px-6 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-black hover:bg-brand-700 shadow-xl shadow-brand-200 flex items-center gap-2 transition-all active:scale-95"
+           >
+            <Plus size={18} /> Run New Identity Check
+           </button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        {/* Toolbar */}
-        <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row gap-4 justify-between">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <input 
-              type="text" 
-              placeholder="Search by candidate name or ID..." 
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-brand-500 focus:border-brand-500 outline-none"
-            />
+      {/* Global Pulse Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {[
+          { label: "Checks Processed", val: "142", trend: "+12 week", icon: FileText, color: "text-brand-600", bg: "bg-brand-50" },
+          { label: "Verified Clean", val: "128", trend: "90% Pass", icon: BadgeCheck, color: "text-green-600", bg: "bg-green-50" },
+          { label: "Anomalies Found", val: "4", trend: "Action Req", icon: ShieldAlert, color: "text-red-600", bg: "bg-red-50" },
+          { label: "Real-time Sync", val: "10", trend: "ETA 24h", icon: Database, color: "text-blue-600", bg: "bg-blue-50" }
+        ].map((s, i) => (
+          <div key={i} className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 group hover:shadow-xl transition-all">
+             <div className="flex justify-between items-start mb-4">
+                <div className={`p-4 ${s.bg} ${s.color} rounded-2xl group-hover:scale-110 transition-transform`}>
+                  <s.icon size={24} />
+                </div>
+                <span className={`text-[10px] font-black uppercase tracking-widest ${s.color}`}>{s.trend}</span>
+             </div>
+             <p className="text-3xl font-black text-gray-900 tracking-tighter">{s.val}</p>
+             <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-1">{s.label}</p>
           </div>
-          <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
-              <Filter size={16} />
-              Filter
-            </button>
-            <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
-              <Download size={16} />
-              Export Report
-            </button>
-          </div>
+        ))}
+      </div>
+
+      {/* Main Ledger Table */}
+      <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+        <div className="p-8 border-b border-gray-100 flex flex-col md:flex-row gap-6 justify-between items-center bg-gray-50/50">
+           <div className="relative flex-1 max-w-lg">
+             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+             <input 
+               type="text" 
+               placeholder="Search by candidate or NIBSS ID..." 
+               className="w-full pl-12 pr-6 py-3 bg-white border border-gray-200 rounded-2xl focus:ring-1 focus:ring-brand-600 outline-none transition-all shadow-sm"
+             />
+           </div>
+           <div className="flex gap-3">
+              <button className="p-3 bg-white border border-gray-200 rounded-xl text-gray-500 hover:text-brand-600 transition-all shadow-sm"><Filter size={20}/></button>
+              <button className="p-3 bg-white border border-gray-200 rounded-xl text-gray-500 hover:text-brand-600 transition-all shadow-sm"><Activity size={20}/></button>
+           </div>
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
-                <th className="px-6 py-4 font-medium">Request ID</th>
-                <th className="px-6 py-4 font-medium">Candidate</th>
-                <th className="px-6 py-4 font-medium">Checks Included</th>
-                <th className="px-6 py-4 font-medium">Risk Assessment</th>
-                <th className="px-6 py-4 font-medium">Status</th>
-                <th className="px-6 py-4 font-medium">Date</th>
-                <th className="px-6 py-4 font-medium"></th>
-              </tr>
+          <table className="w-full text-left">
+            <thead className="bg-gray-50/50 border-b border-gray-100">
+               <tr className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">
+                  <th className="px-8 py-5">Verification ID</th>
+                  <th className="px-8 py-5">Employee / Candidate</th>
+                  <th className="px-8 py-5">Checks</th>
+                  <th className="px-8 py-5">Risk Matrix</th>
+                  <th className="px-8 py-5">Status</th>
+                  <th className="px-8 py-5 text-right">Action</th>
+               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
-              {requests.map((req) => (
-                <tr key={req.id} className="hover:bg-gray-50 transition-colors group cursor-pointer">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    {req.id}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600">
-                        {req.candidateName.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{req.candidateName}</p>
-                        <p className="text-xs text-gray-500">{req.candidateRole}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1">
-                      {req.checks.map((check, idx) => (
-                        <span key={idx} className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded border border-gray-200">
-                          {check}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    {getRiskBadge(req.riskScore)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(req.status)}`}>
-                      {req.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {req.dateRequested}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button className="text-gray-400 hover:text-brand-600 transition-colors">
-                      <ChevronRight size={20} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+            <tbody className="divide-y divide-gray-100">
+               {requests.map(req => (
+                 <tr key={req.id} onClick={() => setSelectedVerification(req)} className="group hover:bg-gray-50/50 cursor-pointer transition-all">
+                    <td className="px-8 py-6 font-black text-gray-400 text-xs">#{req.id}</td>
+                    <td className="px-8 py-6">
+                       <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-brand-600/10 text-brand-600 rounded-xl flex items-center justify-center font-black group-hover:scale-110 transition-transform">{req.candidateName.charAt(0)}</div>
+                          <div>
+                             <p className="font-black text-gray-900 group-hover:text-brand-600 transition-colors">{req.candidateName}</p>
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">{req.candidateRole}</p>
+                          </div>
+                       </div>
+                    </td>
+                    <td className="px-8 py-6">
+                       <div className="flex flex-wrap gap-2">
+                          {req.checks.map((c, i) => (
+                            <span key={i} className="px-2 py-0.5 bg-gray-100 text-gray-500 text-[9px] font-black uppercase tracking-widest rounded border border-gray-200">{c}</span>
+                          ))}
+                       </div>
+                    </td>
+                    <td className="px-8 py-6">
+                       <div className="flex items-center gap-2">
+                          <div className={`w-1.5 h-1.5 rounded-full ${req.riskScore === 'Low' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : req.riskScore === 'Medium' ? 'bg-yellow-500' : 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`}></div>
+                          <span className={`text-[10px] font-black uppercase tracking-widest ${req.riskScore === 'Low' ? 'text-green-600' : req.riskScore === 'Medium' ? 'text-yellow-600' : 'text-red-600'}`}>
+                            {req.riskScore} Risk
+                          </span>
+                       </div>
+                    </td>
+                    <td className="px-8 py-6">
+                       <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${getStatusColor(req.status)}`}>
+                         {req.status}
+                       </span>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                       <button className="p-2 text-gray-300 group-hover:text-brand-600 transition-all"><ArrowRight size={20}/></button>
+                    </td>
+                 </tr>
+               ))}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* New Request Modal (Mock) */}
+      {/* Verification Detail Drawer */}
+      {selectedVerification && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-end bg-black/60 backdrop-blur-sm animate-in fade-in">
+           <div className="w-full max-w-xl h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-500">
+              <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                 <div>
+                    <h3 className="text-2xl font-black text-gray-900 tracking-tight">Identity Report</h3>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Ref: {selectedVerification.id}</p>
+                 </div>
+                 <button onClick={() => setSelectedVerification(null)} className="p-3 hover:bg-gray-200 rounded-2xl transition-colors">
+                    <X size={24} className="text-gray-400" />
+                 </button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto p-10 space-y-10">
+                 <div className="flex items-center gap-6">
+                    <div className="w-24 h-24 bg-brand-600 rounded-3xl flex items-center justify-center text-white text-4xl font-black shadow-2xl">
+                       {selectedVerification.candidateName.charAt(0)}
+                    </div>
+                    <div>
+                       <h4 className="text-3xl font-black text-gray-900 tracking-tighter">{selectedVerification.candidateName}</h4>
+                       <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">{selectedVerification.candidateRole}</p>
+                       <div className="flex items-center gap-2 mt-2">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest border ${getStatusColor(selectedVerification.status)}`}>{selectedVerification.status}</span>
+                          <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">{selectedVerification.dateRequested}</span>
+                       </div>
+                    </div>
+                 </div>
+
+                 <div className="grid grid-cols-2 gap-6">
+                    <div className="p-6 bg-gray-50 rounded-3xl border border-gray-100">
+                       <div className="flex items-center gap-3 mb-4">
+                          <Fingerprint className="text-brand-600" size={20} />
+                          <h5 className="text-[10px] font-black text-gray-900 uppercase tracking-widest">NIN Sync</h5>
+                       </div>
+                       <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                             <span className="text-[10px] font-black text-gray-400 uppercase">Status</span>
+                             <span className="text-[10px] font-black text-green-600 uppercase">MATCH</span>
+                          </div>
+                          <p className="text-xs font-bold text-gray-600">ID: 1234****123</p>
+                       </div>
+                    </div>
+                    <div className="p-6 bg-gray-50 rounded-3xl border border-gray-100">
+                       <div className="flex items-center gap-3 mb-4">
+                          <Database className="text-brand-600" size={20} />
+                          <h5 className="text-[10px] font-black text-gray-900 uppercase tracking-widest">BVN Sync</h5>
+                       </div>
+                       <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                             <span className="text-[10px] font-black text-gray-400 uppercase">Status</span>
+                             <span className="text-[10px] font-black text-green-600 uppercase">MATCH</span>
+                          </div>
+                          <p className="text-xs font-bold text-gray-600">ID: 222****555</p>
+                       </div>
+                    </div>
+                 </div>
+
+                 <div className="bg-gray-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden group">
+                    <h5 className="text-[10px] font-black text-brand-500 uppercase tracking-widest mb-6">Risk Assessment Matrix</h5>
+                    <div className="space-y-4">
+                       <div className="flex justify-between items-center">
+                          <span className="text-sm font-bold text-gray-400">Identity Fraud Risk</span>
+                          <span className="text-sm font-black text-green-400">0.02% (LOW)</span>
+                       </div>
+                       <div className="flex justify-between items-center">
+                          <span className="text-sm font-bold text-gray-400">Criminal History</span>
+                          <span className="text-sm font-black text-green-400">CLEAN</span>
+                       </div>
+                       <div className="flex justify-between items-center">
+                          <span className="text-sm font-bold text-gray-400">Employment Record</span>
+                          <span className="text-sm font-black text-blue-400">VERIFIED</span>
+                       </div>
+                    </div>
+                    <Zap className="absolute -right-8 -bottom-8 w-40 h-40 opacity-5" />
+                 </div>
+
+                 <div className="p-8 border-2 border-dashed border-gray-100 rounded-[2.5rem] text-center">
+                    <FileText className="mx-auto text-gray-200 mb-4" size={48} />
+                    <p className="text-sm font-black text-gray-400 uppercase tracking-widest">Digital Certificate Issued</p>
+                    <button className="mt-4 text-xs font-black text-brand-600 hover:underline">Download Verifiable PDF</button>
+                 </div>
+              </div>
+
+              <div className="p-10 border-t border-gray-100 flex gap-4">
+                 <button className="flex-1 py-4 bg-brand-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-brand-700 transition-all">Archive Record</button>
+                 <button className="flex-1 py-4 bg-gray-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all">Re-Verify (NIBSS)</button>
+              </div>
+           </div>
+        </div>
+      )}
+
+      {/* New Request Modal */}
       {showNewRequestModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="p-5 border-b border-gray-100 flex justify-between items-center">
-              <h3 className="font-bold text-lg text-gray-900">Initiate New Verification</h3>
-              <button onClick={() => setShowNewRequestModal(false)} className="text-gray-400 hover:text-gray-600">
-                <XCircle size={20} />
-              </button>
-            </div>
-            <div className="p-5 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Candidate Name</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                  <input type="text" className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-brand-500 focus:border-brand-500" placeholder="Enter full name" />
-                </div>
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-gray-900/60 backdrop-blur-xl animate-in fade-in">
+           <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+              <div className="p-10 border-b border-gray-50 flex justify-between items-center bg-gray-50">
+                 <div>
+                    <h3 className="text-3xl font-black text-gray-900 tracking-tighter">New Verification</h3>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mt-1">Hotjobs Smart Engine</p>
+                 </div>
+                 <button onClick={() => setShowNewRequestModal(false)} className="p-3 hover:bg-gray-100 rounded-2xl transition-colors">
+                    <X size={24} className="text-gray-400" />
+                 </button>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Select Checks</label>
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input type="checkbox" className="text-brand-600 rounded focus:ring-brand-500" defaultChecked />
-                    <div>
-                      <span className="block text-sm font-medium text-gray-900">Identity Verification</span>
-                      <span className="text-xs text-gray-500">NIN, BVN, and Voters Card check</span>
+              <div className="p-10 space-y-8">
+                 <div className="space-y-1">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Candidate Name</label>
+                    <div className="relative">
+                       <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+                       <input type="text" placeholder="Full Legal Name" className="w-full pl-12 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none font-medium" />
                     </div>
-                  </label>
-                  <label className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input type="checkbox" className="text-brand-600 rounded focus:ring-brand-500" />
-                    <div>
-                      <span className="block text-sm font-medium text-gray-900">Criminal Record</span>
-                      <span className="text-xs text-gray-500">Police clearance and court records</span>
+                 </div>
+                 <div className="space-y-4">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Included Checks (NG Context)</label>
+                    <div className="grid grid-cols-1 gap-3">
+                       {[
+                         { id: 'nin', name: 'NIN Identity Sync', desc: 'Direct NIMC database cross-match.' },
+                         { id: 'bvn', name: 'BVN Financial History', desc: 'Verify ownership via NIBSS protocol.' },
+                         { id: 'crim', name: 'Criminal Record Check', desc: 'Nigeria Police Force database search.' }
+                       ].map(c => (
+                         <label key={c.id} className="flex items-center gap-4 p-5 bg-gray-50 border-2 border-transparent hover:border-brand-600 rounded-3xl cursor-pointer transition-all group">
+                            <input type="checkbox" className="w-5 h-5 rounded text-brand-600 focus:ring-brand-500" defaultChecked />
+                            <div>
+                               <p className="text-sm font-black text-gray-900 uppercase tracking-tight">{c.name}</p>
+                               <p className="text-xs text-gray-500 font-medium">{c.desc}</p>
+                            </div>
+                         </label>
+                       ))}
                     </div>
-                  </label>
-                  <label className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input type="checkbox" className="text-brand-600 rounded focus:ring-brand-500" />
-                    <div>
-                      <span className="block text-sm font-medium text-gray-900">Guarantor Check</span>
-                      <span className="text-xs text-gray-500">Verify guarantor details and address</span>
-                    </div>
-                  </label>
-                </div>
+                 </div>
+                 <button 
+                  onClick={() => { alert("Verification Sync Initiated"); setShowNewRequestModal(false); }}
+                  className="w-full py-6 bg-brand-600 text-white rounded-[2rem] font-black text-sm uppercase tracking-widest hover:bg-brand-700 shadow-2xl shadow-brand-100 transition-all mt-6 active:scale-95"
+                 >
+                    Initiate Smart Check
+                 </button>
               </div>
-            </div>
-            <div className="p-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-              <button onClick={() => setShowNewRequestModal(false)} className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg">Cancel</button>
-              <button onClick={() => setShowNewRequestModal(false)} className="px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg">Submit Request</button>
-            </div>
-          </div>
+           </div>
         </div>
       )}
     </div>

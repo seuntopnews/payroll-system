@@ -1,109 +1,46 @@
 
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Briefcase, Building2, ArrowRight, Mail, Lock, User, CheckCircle, ChevronLeft, Smartphone, Globe } from 'lucide-react';
+import { 
+  Briefcase, Building2, ArrowRight, Mail, Lock, User, CheckCircle, ChevronLeft, 
+  Smartphone, Globe, CreditCard, ShieldCheck, Activity, Zap, ShieldAlert 
+} from 'lucide-react';
 
 interface AuthProps {
-  onLogin: (role: 'employer' | 'employee') => void;
+  onLogin: (role: 'employer' | 'employee' | 'superadmin') => void;
 }
 
-// --- 1. Welcome Screen ---
-export const Welcome = () => {
-  const navigate = useNavigate();
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-900 via-brand-800 to-gray-900 flex items-center justify-center p-6">
-      <div className="max-w-4xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
-        {/* Left Side - Image/Brand */}
-        <div className="md:w-1/2 bg-brand-50 p-10 flex flex-col justify-center items-center text-center relative overflow-hidden">
-          <div className="w-32 h-32 bg-brand-100 rounded-full absolute -top-10 -left-10 opacity-50"></div>
-          <div className="w-64 h-64 bg-brand-100 rounded-full absolute -bottom-20 -right-20 opacity-50"></div>
-          
-          <div className="w-16 h-16 bg-brand-600 rounded-xl flex items-center justify-center text-white font-bold text-3xl shadow-lg mb-6 z-10">
-            H
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 z-10">Hotjobsconnect</h1>
-          <p className="text-gray-600 mb-8 z-10">The Future of Payroll & Recruitment.</p>
-          <img 
-            src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-            alt="Team" 
-            className="rounded-xl shadow-md z-10 object-cover h-48 w-full"
-          />
-        </div>
-
-        {/* Right Side - Actions */}
-        <div className="md:w-1/2 p-10 flex flex-col justify-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Get Started</h2>
-          <div className="space-y-4">
-            <button 
-              onClick={() => navigate('/auth/select?mode=login')}
-              className="w-full py-3 px-6 bg-brand-600 text-white rounded-xl font-bold text-lg hover:bg-brand-700 transition-all shadow-lg shadow-brand-200 flex items-center justify-center gap-2"
-            >
-              Log In
-              <ArrowRight size={18} />
-            </button>
-            <button 
-              onClick={() => navigate('/auth/select?mode=signup')}
-              className="w-full py-3 px-6 bg-white border-2 border-gray-100 text-gray-700 rounded-xl font-bold text-lg hover:border-brand-200 hover:bg-gray-50 transition-all"
-            >
-              Create Account
-            </button>
-          </div>
-          <p className="mt-8 text-center text-xs text-gray-400">
-            By continuing, you agree to our Terms of Service and Privacy Policy.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// --- 2. User Type Selection ---
 export const UserSelection = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const mode = searchParams.get('mode') || 'login'; // 'login' or 'signup'
+  const mode = searchParams.get('mode') || 'login';
 
-  const handleSelection = (type: 'employer' | 'jobseeker') => {
-    if (type === 'jobseeker') {
-      navigate(`/auth/jobseeker/${mode}`);
-    } else {
-      navigate(`/auth/${mode}`);
+  const handleSelection = (type: 'employer' | 'employee') => {
+    if (type === 'employee') navigate(`/auth/employee/${mode}`);
+    else {
+      if (mode === 'signup') navigate('/welcome#pricing');
+      else navigate(`/auth/login`);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="max-w-2xl w-full">
-        <button onClick={() => navigate('/welcome')} className="mb-6 flex items-center gap-2 text-gray-500 hover:text-gray-900 font-medium transition-colors">
-          <ChevronLeft size={20} /> Back
+        <button onClick={() => navigate('/welcome')} className="mb-10 flex items-center gap-2 text-gray-400 hover:text-gray-900 font-black text-[10px] uppercase tracking-widest transition-colors">
+          <ChevronLeft size={16} /> Back to Home
         </button>
-        
-        <h2 className="text-3xl font-bold text-gray-900 text-center mb-2">Choose Account Type</h2>
-        <p className="text-center text-gray-500 mb-10">How do you want to use Hotjobsconnect?</p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Jobseeker Card */}
-          <div 
-            onClick={() => handleSelection('jobseeker')}
-            className="bg-white p-8 rounded-2xl shadow-sm border-2 border-transparent hover:border-brand-500 cursor-pointer transition-all group"
-          >
-            <div className="w-14 h-14 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <Briefcase size={28} />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Job Seeker / Employee</h3>
-            <p className="text-gray-500 text-sm">I'm looking for a job, or I want to access my employee portal (Payroll, Leave).</p>
+        <h2 className="text-4xl font-black text-gray-900 text-center mb-4 tracking-tighter">Enter the Ecosystem.</h2>
+        <p className="text-center text-gray-500 mb-12 font-medium">Choose your portal into Nigeria's #1 unified HR network.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div onClick={() => handleSelection('employee')} className="bg-gray-50 p-10 rounded-[2.5rem] border-2 border-transparent hover:border-brand-600 hover:bg-white cursor-pointer transition-all group shadow-sm hover:shadow-2xl">
+            <div className="w-16 h-16 bg-white text-brand-600 rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:bg-brand-600 group-hover:text-white transition-all"><User size={32} /></div>
+            <h3 className="text-2xl font-black text-gray-900 mb-2 tracking-tight">Verified Employee</h3>
+            <p className="text-gray-500 text-sm font-medium leading-relaxed">Find verified roles, track your payslips, and build a career history with identity assurance.</p>
           </div>
-
-          {/* Employer Card */}
-          <div 
-             onClick={() => handleSelection('employer')}
-             className="bg-white p-8 rounded-2xl shadow-sm border-2 border-transparent hover:border-brand-500 cursor-pointer transition-all group"
-          >
-            <div className="w-14 h-14 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <Building2 size={28} />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Employer / HR</h3>
-            <p className="text-gray-500 text-sm">I want to manage payroll, hire talent, and handle compliance.</p>
+          <div onClick={() => handleSelection('employer')} className="bg-gray-900 p-10 rounded-[2.5rem] text-white cursor-pointer transition-all group shadow-2xl hover:scale-[1.02]">
+            <div className="w-16 h-16 bg-brand-600 text-white rounded-2xl flex items-center justify-center mb-8"><Building2 size={32} /></div>
+            <h3 className="text-2xl font-black mb-2 tracking-tight">Business Hub</h3>
+            <p className="text-gray-400 text-sm font-medium leading-relaxed">Automate payroll, compliance, and recruitment for your Nigerian workforce in one place.</p>
           </div>
         </div>
       </div>
@@ -111,56 +48,147 @@ export const UserSelection = () => {
   );
 };
 
-// --- 3. Login Form (Employer) ---
 export const Login = ({ onLogin }: AuthProps) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      onLogin('employer');
+      if (email === 'root@hotjobs.com') onLogin('superadmin');
+      else onLogin('employer');
     }, 1000);
+  };
+
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
+      <div className="max-w-md w-full">
+        <div className="text-center mb-12">
+          <div className="w-16 h-16 bg-brand-600 rounded-2xl flex items-center justify-center text-white font-black text-3xl shadow-xl mx-auto mb-6">H</div>
+          <h2 className="text-3xl font-black text-gray-900 tracking-tighter">Management Console</h2>
+          <p className="text-gray-500 font-medium uppercase tracking-widest text-[10px] mt-2">Secure Business Access</p>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+              <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none transition-all font-medium" placeholder="ceo@company.com" />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Password</label>
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+              <input type="password" required className="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none transition-all font-medium" placeholder="••••••••" />
+            </div>
+          </div>
+          <button type="submit" disabled={isLoading} className="w-full py-5 bg-brand-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-brand-700 transition-all shadow-xl active:scale-95 mt-4">
+            {isLoading ? 'Decrypting...' : 'Sign In'}
+          </button>
+        </form>
+        <div className="mt-8 p-4 bg-gray-50 rounded-xl flex items-start gap-3">
+          <ShieldAlert size={16} className="text-brand-600 shrink-0 mt-0.5" />
+          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Super Admin Login: use <span className="text-gray-900">root@hotjobs.com</span></p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const Signup = ({ onLogin }: AuthProps) => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const packageName = searchParams.get('package') || 'starter';
+  const [step, setStep] = useState(packageName === 'starter' ? 2 : 1);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handlePayment = () => {
+    setIsProcessing(true);
+    setTimeout(() => { setIsProcessing(false); setStep(2); }, 2500);
+  };
+
+  const handleFinalSignup = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsProcessing(true);
+    setTimeout(() => { setIsProcessing(false); onLogin('employer'); }, 1500);
+  };
+
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
+      <div className="max-w-md w-full">
+        {step === 1 ? (
+          <div className="animate-in fade-in slide-in-from-bottom duration-500">
+            <div className="text-center mb-10">
+              <div className="w-16 h-16 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-6"><CreditCard size={32} /></div>
+              <h2 className="text-3xl font-black text-gray-900 tracking-tighter">Checkout</h2>
+              <p className="text-gray-500 font-medium">Activate <span className="text-brand-600 font-black uppercase tracking-widest text-[10px]">{packageName}</span></p>
+            </div>
+            <div className="bg-gray-50 p-8 rounded-[2.5rem] border border-gray-100 mb-8 shadow-sm">
+               <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
+                <span className="text-xl font-black text-gray-900">Total Due</span>
+                <span className="text-3xl font-black text-brand-600">₦35,000</span>
+              </div>
+              <div className="space-y-4">
+                 <input type="text" placeholder="Card Number" className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl outline-none" />
+                 <div className="grid grid-cols-2 gap-4">
+                    <input type="text" placeholder="MM/YY" className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl" />
+                    <input type="text" placeholder="CVV" className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl" />
+                 </div>
+              </div>
+            </div>
+            <button onClick={handlePayment} disabled={isProcessing} className="w-full py-5 bg-brand-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-brand-700 shadow-xl transition-all">
+              {isProcessing ? <Activity size={20} className="animate-spin mx-auto" /> : 'Confirm Order'}
+            </button>
+          </div>
+        ) : (
+          <div className="animate-in fade-in zoom-in-95 duration-500">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-black text-gray-900 tracking-tighter">Deploy Organization</h2>
+              <p className="text-gray-500 font-medium">Configure your Hotjobsconnect workspace.</p>
+            </div>
+            <form onSubmit={handleFinalSignup} className="space-y-4">
+              <input type="text" required className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none font-medium" placeholder="Business Name" />
+              <input type="text" required className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none font-medium" placeholder="Full Name" />
+              <input type="email" required className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none font-medium" placeholder="Work Email" />
+              <input type="password" required className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none font-medium" placeholder="Password" />
+              <button type="submit" disabled={isProcessing} className="w-full py-5 bg-brand-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-brand-700 shadow-xl mt-6 active:scale-95">
+                {isProcessing ? 'Deploying...' : 'Launch Workspace'}
+              </button>
+            </form>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export const EmployeeLogin = ({ onLogin }: AuthProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setTimeout(() => { setIsLoading(false); onLogin('employee'); }, 1000);
   };
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="max-w-md w-full">
         <div className="text-center mb-10">
-          <div className="w-12 h-12 bg-brand-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg mx-auto mb-4">H</div>
-          <h2 className="text-2xl font-bold text-gray-900">Employer Login</h2>
-          <p className="text-gray-500">Access your HR Command Center</p>
+           <div className="w-16 h-16 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-6"><User size={32} /></div>
+          <h2 className="text-3xl font-black text-gray-900 tracking-tighter">Employee Portal.</h2>
+          <p className="text-gray-500 font-medium">Career, Finance & Verified Identity.</p>
         </div>
-
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Work Email</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input type="email" required className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all" placeholder="name@company.com" />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input type="password" required className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all" placeholder="••••••••" />
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" className="text-brand-600 rounded focus:ring-brand-500" />
-              <span className="text-gray-600">Remember me</span>
-            </label>
-            <button type="button" className="text-brand-600 font-medium hover:underline">Forgot password?</button>
-          </div>
-
-          <button type="submit" disabled={isLoading} className="w-full py-3 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors flex items-center justify-center gap-2">
-            {isLoading ? 'Logging in...' : 'Sign In'}
-            {!isLoading && <ArrowRight size={18} />}
+          <input type="email" required className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Email Address" />
+          <input type="password" required className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Password" />
+          <button type="submit" disabled={isLoading} className="w-full py-5 bg-gray-900 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-black transition-all shadow-xl mt-4">
+            {isLoading ? 'Accessing...' : 'Log In to My Portal'}
           </button>
         </form>
       </div>
@@ -168,174 +196,37 @@ export const Login = ({ onLogin }: AuthProps) => {
   );
 };
 
-// --- 4. Signup Form (Employer) ---
-export const Signup = ({ onLogin }: AuthProps) => {
-  const navigate = useNavigate();
+export const EmployeeSignup = ({ onLogin }: AuthProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      onLogin('employer');
-    }, 1500);
+    setTimeout(() => { setIsLoading(false); onLogin('employee'); }, 1500);
   };
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-6">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900">Create Employer Account</h2>
-          <p className="text-gray-500">Start managing your team today.</p>
+      <div className="max-w-lg w-full">
+        <div className="text-center mb-10">
+          <h2 className="text-4xl font-black text-gray-900 tracking-tighter">Become Verified Talent.</h2>
+          <p className="text-gray-500 font-medium">Join 2.4M employees already synced with top recruiters.</p>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
-            <div className="relative">
-              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input type="text" required className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" placeholder="Acme Corp" />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input type="text" required className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" placeholder="John Doe" />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Work Email</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input type="email" required className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" placeholder="hr@company.com" />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input type="password" required className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" placeholder="Create a strong password" />
-            </div>
-          </div>
-
-          <button type="submit" disabled={isLoading} className="w-full py-3 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
-            {isLoading ? 'Creating Account...' : 'Get Started'}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-};
-
-// --- 5. Jobseeker Login ---
-export const JobseekerLogin = ({ onLogin }: AuthProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      onLogin('employee'); // Pass 'employee' role
-    }, 1000);
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl">
-        <button onClick={() => navigate('/auth/select?mode=login')} className="mb-6 text-gray-400 hover:text-gray-600 flex items-center gap-1 text-sm">
-          <ChevronLeft size={16} /> Back
-        </button>
-        <div className="text-center mb-8">
-           <div className="w-12 h-12 bg-brand-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg mx-auto mb-4">
-             <User size={24} />
-           </div>
-          <h2 className="text-2xl font-bold text-gray-900">Talent Portal Login</h2>
-          <p className="text-gray-500">Manage your career, payroll, and applications.</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-            <input type="email" required className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none" placeholder="you@example.com" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input type="password" required className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none" placeholder="••••••••" />
-          </div>
-          <button type="submit" disabled={isLoading} className="w-full py-3 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
-            {isLoading ? 'Accessing Portal...' : 'Login to Portal'}
-          </button>
-        </form>
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Don't have a profile? <button onClick={() => navigate('/auth/jobseeker/signup')} className="text-brand-600 font-bold hover:underline">Create CV</button>
-        </p>
-      </div>
-    </div>
-  );
-};
-
-// --- 6. Jobseeker Signup ---
-export const JobseekerSignup = ({ onLogin }: AuthProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      onLogin('employee');
-    }, 1500);
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="max-w-lg w-full bg-white p-8 rounded-2xl shadow-xl">
-         <button onClick={() => navigate('/auth/select?mode=signup')} className="mb-6 text-gray-400 hover:text-gray-600 flex items-center gap-1 text-sm">
-          <ChevronLeft size={16} /> Back
-        </button>
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900">Join the Talent Pool</h2>
-          <p className="text-gray-500">Create your profile to get hired, get paid, and get trained.</p>
-        </div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-              <input type="text" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
-            </div>
-             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-              <input type="text" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
-            </div>
+            <input type="text" required className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none" placeholder="First Name" />
+            <input type="text" required className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Last Name" />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-            <input type="email" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+          <input type="email" required className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Email Address" />
+          <input type="text" required className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Primary Profession" />
+          <input type="password" required className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Password" />
+          <div className="p-5 bg-brand-50 rounded-[2rem] border border-brand-100 text-[11px] font-bold text-brand-900 flex items-start gap-4">
+             <CheckCircle size={18} className="shrink-0 text-brand-600" />
+             <div>Your profile is automatically indexed by the <span className="font-black">Smart Engine</span> for premium verified roles.</div>
           </div>
-           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Primary Skill / Role</label>
-            <input type="text" required placeholder="e.g. Frontend Developer" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input type="password" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
-          </div>
-
-           <div className="p-3 bg-brand-50 rounded-lg border border-brand-100 text-xs text-brand-800 flex items-start gap-2">
-             <CheckCircle size={14} className="shrink-0 mt-0.5" />
-             <div>
-               By signing up, your profile will be visible to top employers on Hotjobsconnect.
-             </div>
-           </div>
-
-          <button type="submit" disabled={isLoading} className="w-full py-3 bg-brand-600 text-white rounded-xl font-bold hover:bg-brand-700 transition-colors">
-            {isLoading ? 'Creating Profile...' : 'Create Free Profile'}
+          <button type="submit" disabled={isLoading} className="w-full py-5 bg-brand-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-brand-700 transition-all shadow-xl mt-6 active:scale-95">
+            {isLoading ? 'Processing...' : 'Create Verified Talent Profile'}
           </button>
         </form>
       </div>

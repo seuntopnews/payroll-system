@@ -1,8 +1,8 @@
+
 import { GoogleGenAI } from "@google/genai";
 
-const API_KEY = process.env.API_KEY || '';
-
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+// Use process.env.API_KEY directly as per coding guidelines
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const SYSTEM_INSTRUCTION = `
 You are the "Hotjobsconnect AI Assistant", a specialized HR and Payroll expert embedded within the Hotjobsconnect Payroll System for the Nigerian market.
@@ -24,8 +24,9 @@ Keep responses concise and formatted with Markdown.
 // For standard chat interactions
 export const generateHRResponse = async (prompt: string, history: { role: 'user' | 'model'; text: string }[] = []) => {
   try {
+    // Using gemini-3-flash-preview for basic text tasks
     const chat = ai.chats.create({
-      model: 'gemini-2.5-flash', // Fast model for chat
+      model: 'gemini-3-flash-preview',
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
       },
@@ -60,7 +61,7 @@ export const generateDeepInsights = async (dataContext: string, query: string) =
       model: 'gemini-3-pro-preview', // Powerful model for reasoning
       contents: prompt,
       config: {
-        thinkingConfig: { thinkingBudget: 2048 } // Enable thinking for complex analysis
+        thinkingConfig: { thinkingBudget: 4096 } // Reasonable thinking budget for analysis
       }
     });
     
@@ -81,8 +82,9 @@ export const analyzeCandidateCV = async (jobDescription: string, candidateSummar
       Output JSON: { "score": number, "reason": "string" }
     `;
     
+    // Using gemini-3-flash-preview for text generation tasks
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
         responseMimeType: "application/json"

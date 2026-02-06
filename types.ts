@@ -1,4 +1,10 @@
 
+export enum UserRole {
+  SuperAdmin = 'superadmin',
+  Employer = 'employer',
+  Employee = 'employee'
+}
+
 export enum EmployeeStatus {
   Active = 'Active',
   OnLeave = 'On Leave',
@@ -14,44 +20,23 @@ export interface Employee {
   department: string;
   status: EmployeeStatus;
   salary: number;
-  currency: string; // Multi-currency support
+  currency: string; 
   joinDate: string;
   avatarUrl: string;
   compliance: {
-    taxId?: string; // TIN
-    pensionId?: string; // RSA
+    taxId?: string; 
+    pensionId?: string; 
     nhfId?: string;
   };
 }
 
-export interface PayrollCycle {
-  id: string;
-  month: string;
-  year: number;
-  totalGross: number;
-  totalNet: number;
-  totalDeductions: number;
-  status: 'Draft' | 'Processing' | 'Approval' | 'Disbursed';
-  complianceStatus: 'Pending' | 'Filed';
-}
-
-export interface LoanRequest {
-  id: string;
-  employeeName: string;
-  amount: number;
-  type: 'Personal' | 'Salary Advance' | 'Housing';
-  status: 'Pending' | 'Approved' | 'Rejected';
-  repaymentMonths: number;
-  interestRate: number;
-}
-
-export interface Candidate {
+export interface Organization {
   id: string;
   name: string;
-  role: string;
-  matchScore: number; // Gemini AI Score
-  status: 'Applied' | 'Screening' | 'Interview' | 'Offer';
-  source: 'Hotjobsconnect' | 'External';
+  plan: 'Starter' | 'Growth' | 'Enterprise';
+  employeeCount: number;
+  status: 'Active' | 'Suspended';
+  createdAt: string;
 }
 
 export interface ChatMessage {
@@ -60,92 +45,13 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
-// --- New Types for Employee Portal ---
-
-export interface UserProfile {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  role: string;
-  avatarUrl: string;
-  bio: string;
-  address: string;
-  skills: string[];
-  experience: {
-    company: string;
-    role: string;
-    duration: string;
-    description: string;
-  }[];
-  education: {
-    school: string;
-    degree: string;
-    year: string;
-  }[];
-  kyc: {
-    bvnVerified: boolean;
-    ninVerified: boolean;
-    idDocumentUrl?: string;
-  };
-  bankDetails: {
-    bankName: string;
-    accountNumber: string;
-    accountName: string;
-  }[];
-}
-
-export interface JobListing {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  type: string;
-  salaryRange: string;
-  postedDate: string;
-  matchScore: number;
-}
-
-export interface LeaveRequest {
-  id: string;
-  type: 'Annual' | 'Sick' | 'Casual' | 'Maternity';
-  startDate: string;
-  endDate: string;
-  status: 'Pending' | 'Approved' | 'Rejected';
-  reason: string;
-}
-
-export interface PaySlip {
-  id: string;
-  month: string;
-  year: number;
-  netPay: number;
-  grossPay: number;
-  deductions: number;
-  pdfUrl: string;
-}
-
-// --- SHARED TYPES FOR SYNC ---
-
 export interface Task {
   id: string;
   title: string;
-  assignedTo: string; // Employee Name
-  assignedBy: string; // Employer Name
+  assignedTo: string;
+  assignedBy: string;
   dueDate: string;
   priority: 'High' | 'Medium' | 'Low';
   status: 'Pending' | 'In Progress' | 'Completed';
   description?: string;
-}
-
-export interface AttendanceRecord {
-  id: string;
-  employeeId: string;
-  employeeName: string;
-  date: string;
-  clockIn: string;
-  clockOut?: string;
-  status: 'Present' | 'Late' | 'Absent';
-  location?: string; // GPS
 }
