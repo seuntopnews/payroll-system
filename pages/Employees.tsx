@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, Filter, Plus, MoreVertical, Upload, UserPlus, Download, FileText, ChevronDown, AlertCircle } from 'lucide-react';
+import { Search, Filter, Plus, MoreVertical, Upload, UserPlus, Download, FileText, ChevronDown, AlertCircle, X, CheckCircle2 } from 'lucide-react';
 import { Employee, EmployeeStatus } from '../types';
 
 const MOCK_EMPLOYEES: Employee[] = [
@@ -61,12 +61,34 @@ const MOCK_EMPLOYEES: Employee[] = [
 const Employees = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'onboarding'>('all');
   const [employees, setEmployees] = useState<Employee[]>(MOCK_EMPLOYEES);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [formData, setFormData] = useState({ fullName: '', email: '', role: '', department: 'Engineering' });
 
   // Function to handle status changes
   const handleStatusChange = (employeeId: string, newStatus: string) => {
     setEmployees(prev => prev.map(emp => 
       emp.id === employeeId ? { ...emp, status: newStatus as EmployeeStatus } : emp
     ));
+  };
+
+  const handleAddEmployee = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newEmp: Employee = {
+      id: `EMP00${employees.length + 1}`,
+      fullName: formData.fullName,
+      email: formData.email,
+      role: formData.role,
+      department: formData.department,
+      status: EmployeeStatus.Onboarding,
+      salary: 0,
+      currency: 'NGN',
+      joinDate: new Date().toISOString().split('T')[0],
+      avatarUrl: `https://i.pravatar.cc/150?u=${formData.email}`,
+      compliance: {}
+    };
+    setEmployees([...employees, newEmp]);
+    setIsAddModalOpen(false);
+    setFormData({ fullName: '', email: '', role: '', department: 'Engineering' });
   };
 
   const filteredEmployees = activeTab === 'all' 
@@ -100,7 +122,10 @@ const Employees = () => {
             <Download size={16} />
             Export
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 shadow-sm">
+          <button 
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 shadow-sm"
+          >
             <Plus size={16} />
             Add Employee
           </button>
@@ -238,6 +263,48 @@ const Employees = () => {
           </table>
         </div>
       </div>
+
+      {/* Add Employee Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-6 animate-in fade-in">
+          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+             <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 className="text-2xl font-black text-gray-900">Add New Staff</h3>
+                <button onClick={() => setIsAddModalOpen(false)} className="p-2 hover:bg-gray-200 rounded-xl transition-colors">
+                  <X size={24} className="text-gray-400" />
+                </button>
+             </div>
+             <form onSubmit={handleAddEmployee} className="p-8 space-y-5">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Legal Name</label>
+                  <input type="text" required value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none font-bold" placeholder="Femi Ola" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Work Email</label>
+                  <input type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none font-bold" placeholder="f.ola@company.com" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Role</label>
+                    <input type="text" required value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none font-bold text-sm" placeholder="Designer" />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Dept</label>
+                    <select value={formData.department} onChange={e => setFormData({...formData, department: e.target.value})} className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none font-bold text-sm appearance-none">
+                       <option>Engineering</option>
+                       <option>Marketing</option>
+                       <option>Sales</option>
+                       <option>Finance</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="submit" className="w-full py-5 bg-brand-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-brand-700 shadow-xl transition-all active:scale-95 mt-4">
+                   Send Onboarding Invite
+                </button>
+             </form>
+          </div>
+        </div>
+      )}
       
       {/* AI Insight for Employees */}
       {activeTab === 'all' && (

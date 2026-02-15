@@ -14,7 +14,8 @@ import {
   Clock,
   Wallet,
   LogOut,
-  CheckSquare
+  CheckSquare,
+  CreditCard
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -69,9 +70,9 @@ const Sidebar = ({ onLogout }: SidebarProps) => {
               <Banknote size={18} />
               Payroll & Compliance
             </NavLink>
-            <NavLink to="/loans" className={navClasses}>
-              <Wallet size={18} />
-              Loans & Advances
+            <NavLink to="/billing" className={navClasses}>
+              <CreditCard size={18} />
+              Billing & Plans
             </NavLink>
              <NavLink to="/reports" className={navClasses}>
               <PieChart size={18} />

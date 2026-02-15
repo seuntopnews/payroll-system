@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { Search, MapPin, Clock, DollarSign, Sparkles, Bookmark } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, MapPin, Clock, DollarSign, Sparkles, Bookmark, CheckCircle, ArrowRight } from 'lucide-react';
 
 const MOCK_JOBS = [
   {
@@ -11,6 +11,7 @@ const MOCK_JOBS = [
     type: 'Full-time',
     salary: '₦800k - ₦1.2M',
     match: 95,
+    status: 'Hired',
     tags: ['Mobile', 'React', 'Fintech']
   },
   {
@@ -21,6 +22,7 @@ const MOCK_JOBS = [
     type: 'Contract',
     salary: '₦600k - ₦900k',
     match: 82,
+    status: 'Applied',
     tags: ['Web', 'Vue.js']
   },
   {
@@ -31,11 +33,14 @@ const MOCK_JOBS = [
     type: 'Full-time',
     salary: '₦500k - ₦700k',
     match: 45,
+    status: 'None',
     tags: ['Figma', 'Design']
   }
 ];
 
 const EmployeeJobs = () => {
+  const [jobs, setJobs] = useState(MOCK_JOBS);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -71,15 +76,22 @@ const EmployeeJobs = () => {
 
       {/* Job Listings */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {MOCK_JOBS.map(job => (
-          <div key={job.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:border-blue-300 transition-all group relative">
+        {jobs.map(job => (
+          <div key={job.id} className={`bg-white rounded-xl shadow-sm border p-6 hover:border-blue-300 transition-all group relative ${job.status === 'Hired' ? 'border-brand-500 ring-2 ring-brand-50' : 'border-gray-200'}`}>
             <div className="flex justify-between items-start mb-4">
               <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center font-bold text-gray-600 text-lg">
                 {job.company.charAt(0)}
               </div>
-              <button className="text-gray-400 hover:text-blue-600">
-                <Bookmark size={20} />
-              </button>
+              <div className="flex items-center gap-2">
+                 {job.status === 'Hired' && (
+                   <span className="px-3 py-1 bg-brand-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg flex items-center gap-1">
+                     <CheckCircle size={10}/> HIRED
+                   </span>
+                 )}
+                 <button className="text-gray-400 hover:text-blue-600">
+                    <Bookmark size={20} />
+                 </button>
+              </div>
             </div>
             
             <h3 className="font-bold text-lg text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">{job.title}</h3>
@@ -102,9 +114,19 @@ const EmployeeJobs = () => {
                  <Sparkles size={14} />
                  {job.match}% Match
                </div>
-               <button className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800">
-                 Apply
-               </button>
+               {job.status === 'Hired' ? (
+                 <button className="px-4 py-2 bg-brand-600 text-white text-xs font-black uppercase tracking-widest rounded-lg hover:bg-brand-700 flex items-center gap-2">
+                   Start Onboarding <ArrowRight size={14}/>
+                 </button>
+               ) : job.status === 'Applied' ? (
+                 <button className="px-4 py-2 bg-gray-100 text-gray-400 text-xs font-black uppercase tracking-widest rounded-lg cursor-default">
+                   Applied
+                 </button>
+               ) : (
+                 <button className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800">
+                   Apply
+                 </button>
+               )}
             </div>
           </div>
         ))}

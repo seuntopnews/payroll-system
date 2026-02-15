@@ -1,6 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { auth } from './services/firebase';
 import Sidebar from './components/Sidebar';
 import EmployeeSidebar from './components/EmployeeSidebar';
 import SuperAdminSidebar from './components/superadmin/SuperAdminSidebar';
@@ -11,9 +13,10 @@ import Recruitment from './pages/Recruitment';
 import BackgroundCheck from './pages/BackgroundCheck';
 import Tasks from './pages/Tasks';
 import Attendance from './pages/Attendance';
+import Billing from './pages/Billing';
 import AIChat from './components/AIChat';
 import MarketingLanding from './pages/MarketingLanding';
-import { UserSelection, Login, Signup, EmployeeLogin, EmployeeSignup } from './pages/Auth';
+import { UserSelection, Login, Signup, EmployeeLogin, EmployeeSignup, SuperAdminLogin } from './pages/Auth';
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
 import EmployeeProfile from './pages/employee/EmployeeProfile';
 import EmployeeJobs from './pages/employee/EmployeeJobs';
@@ -88,50 +91,88 @@ const SuperAdminLayout = ({ children, onLogout }: LayoutProps) => {
 };
 
 const AppContent = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<'employer' | 'employee' | 'superadmin' | null>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const handleLogin = (role: 'employer' | 'employee' | 'superadmin') => {
-    setIsAuthenticated(true);
+  useEffect(() => {
+    const savedRole = localStorage.getItem('hotjobs_role') as any;
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      if (!firebaseUser) {
+        if (savedRole === 'superadmin') {
+          setUserRole('superadmin');
+        } else {
+          setUserRole(null);
+          localStorage.removeItem('hotjobs_role');
+        }
+      } else {
+        if (savedRole) setUserRole(savedRole);
+        else setUserRole(null);
+      }
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLoginSuccess = (role: 'employer' | 'employee' | 'superadmin') => {
     setUserRole(role);
+    localStorage.setItem('hotjobs_role', role);
     if (role === 'employer') navigate('/');
     else if (role === 'employee') navigate('/portal');
     else if (role === 'superadmin') navigate('/superadmin');
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUserRole(null);
-    navigate('/welcome');
+  const handleLogout = async () => {
+    try {
+      if (userRole !== 'superadmin') await signOut(auth);
+      localStorage.removeItem('hotjobs_role');
+      setUserRole(null);
+      navigate('/welcome');
+    } catch (error) {
+      console.error("Logout error", error);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="w-10 h-10 border-4 border-brand-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  const isAuthenticated = user || userRole === 'superadmin';
 
   return (
     <Routes>
       <Route path="/welcome" element={<MarketingLanding />} />
       <Route path="/auth/select" element={<UserSelection />} />
-      <Route path="/auth/login" element={<Login onLogin={handleLogin} />} />
-      <Route path="/auth/signup" element={<Signup onLogin={handleLogin} />} />
-      <Route path="/auth/employee/login" element={<EmployeeLogin onLogin={handleLogin} />} />
-      <Route path="/auth/employee/signup" element={<EmployeeSignup onLogin={handleLogin} />} />
+      <Route path="/auth/employer/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
+      <Route path="/auth/employer/signup" element={<Signup onLoginSuccess={handleLoginSuccess} />} />
+      <Route path="/auth/employee/login" element={<EmployeeLogin onLoginSuccess={handleLoginSuccess} />} />
+      <Route path="/auth/employee/signup" element={<EmployeeSignup onLoginSuccess={handleLoginSuccess} />} />
+      <Route path="/auth/superadmin/login" element={<SuperAdminLogin onLoginSuccess={handleLoginSuccess} />} />
 
-      {isAuthenticated ? (
+      {isAuthenticated && userRole ? (
         <>
           {userRole === 'employer' && (
             <>
               <Route path="/" element={<EmployerLayout onLogout={handleLogout}><Dashboard /></EmployerLayout>} />
               <Route path="/employees" element={<EmployerLayout onLogout={handleLogout}><Employees /></EmployerLayout>} />
               <Route path="/payroll" element={<EmployerLayout onLogout={handleLogout}><Payroll /></EmployerLayout>} />
+              <Route path="/billing" element={<EmployerLayout onLogout={handleLogout}><Billing /></EmployerLayout>} />
               <Route path="/recruitment" element={<EmployerLayout onLogout={handleLogout}><Recruitment /></EmployerLayout>} />
               <Route path="/verification" element={<EmployerLayout onLogout={handleLogout}><BackgroundCheck /></EmployerLayout>} />
               <Route path="/tasks" element={<EmployerLayout onLogout={handleLogout}><Tasks /></EmployerLayout>} />
               <Route path="/attendance" element={<EmployerLayout onLogout={handleLogout}><Attendance /></EmployerLayout>} />
             </>
           )}
-
           {userRole === 'employee' && (
             <>
               <Route path="/portal" element={<EmployeeLayout onLogout={handleLogout}><EmployeeDashboard /></EmployeeLayout>} />
+              {/* Fix: Replaced nonexistent EmployeeProfileLayout closing tag with EmployeeLayout */}
               <Route path="/portal/profile" element={<EmployeeLayout onLogout={handleLogout}><EmployeeProfile /></EmployeeLayout>} />
               <Route path="/portal/jobs" element={<EmployeeLayout onLogout={handleLogout}><EmployeeJobs /></EmployeeLayout>} />
               <Route path="/portal/tasks" element={<EmployeeLayout onLogout={handleLogout}><EmployeeTasks /></EmployeeLayout>} />
@@ -139,13 +180,13 @@ const AppContent = () => {
               <Route path="/portal/workplace" element={<EmployeeLayout onLogout={handleLogout}><Workplace /></EmployeeLayout>} />
             </>
           )}
-
           {userRole === 'superadmin' && (
             <Route path="/superadmin" element={<SuperAdminLayout onLogout={handleLogout}><SuperAdminDashboard /></SuperAdminLayout>} />
           )}
-
           <Route path="*" element={<Navigate to={userRole === 'employer' ? '/' : userRole === 'employee' ? '/portal' : '/superadmin'} replace />} />
         </>
+      ) : isAuthenticated && !userRole ? (
+        <Route path="*" element={<Navigate to="/auth/select" replace />} />
       ) : (
         <Route path="*" element={<Navigate to="/welcome" replace />} />
       )}
